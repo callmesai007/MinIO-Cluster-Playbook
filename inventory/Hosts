@@ -7,9 +7,10 @@
 # This playbook is licensed under the MIT License. See the LICENSE file for
 # ----------------------------------------------------------------------------
 
-[minio_servers]
+#[minio_servers]
 #Example of Inventory
 #minio-1 ansible_host=192.168.1.x
 #minio-2 ansible_host=192.168.1.y
 #minio-3 ansible_host=192.168.1.z
 #minio-4 ansible_host=192.168.1.t
+

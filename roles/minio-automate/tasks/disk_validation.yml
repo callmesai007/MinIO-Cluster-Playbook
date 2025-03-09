@@ -12,17 +12,17 @@
   pause:
     prompt: "Enter the disk to use for MinIO on all nodes (e.g., /dev/sdb):"
   register: disk_prompt
-  run_once: yes  # Ensure this runs only once
+  run_once: yes
 
 - name: Set disk variable for all nodes
   set_fact:
     minio_disk: "{{ disk_prompt.user_input }}"
-  run_once: yes  # Ensure this runs only once
+  run_once: yes
 
 - name: Share disk variable with all hosts
   set_fact:
     minio_disk: "{{ hostvars[groups['all'][0]].minio_disk }}"
-  when: inventory_hostname != groups['all'][0]  # Skip the first host (where the variable is already set)
+  when: inventory_hostname != groups['all'][0]
 
 - name: Check if the specified disk exists
   stat:
@@ -44,20 +44,20 @@
     prompt: "The disk {{ minio_disk }} does not have a filesystem. Enter the filesystem type to format it with (default: xfs):"
   when: disk_fs_type.stdout == ""
   register: fs_type_prompt
-  run_once: yes  # Ensure this runs only once
+  run_once: yes
 
 - name: Set filesystem type
   set_fact:
     fs_type: "{{ fs_type_prompt.user_input | default('xfs') }}"
   when: disk_fs_type.stdout == ""
-  run_once: yes  # Ensure this runs only once
+  run_once: yes
 
 - name: Share filesystem type with all hosts
   set_fact:
     fs_type: "{{ hostvars[groups['all'][0]].fs_type }}"
   when:
     - disk_fs_type.stdout == ""
-    - inventory_hostname != groups['all'][0]  # Skip the first host (where the variable is already set)
+    - inventory_hostname != groups['all'][0]
 
 - name: Format disk with specified filesystem if not already formatted
   filesystem:
@@ -73,7 +73,7 @@
   mount:
     path: "{{ minio_data_dir }}"
     src: "UUID={{ disk_uuid.stdout }}"
-    fstype: "{{ disk_fs_type.stdout | default(fs_type) }}"  # Use existing filesystem or user-provided type
+    fstype: "{{ disk_fs_type.stdout | default(fs_type) }}"
     opts: defaults
     state: present
 
@@ -87,6 +87,6 @@
   mount:
     path: "{{ minio_data_dir }}"
     src: "UUID={{ disk_uuid.stdout }}"
-    fstype: "{{ disk_fs_type.stdout | default(fs_type, 'xfs') }}"  # Use existing filesystem or user-provided type
+    fstype: "{{ disk_fs_type.stdout | default(fs_type, 'xfs') }}"
     opts: "defaults"
     state: mounted
