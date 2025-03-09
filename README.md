@@ -45,8 +45,8 @@ Before using this playbook, ensure the following:
 
 
 ## Inventory Configuration
-Define your MinIO servers in the inventory/Hosts file. Example:
-[minio_servers]
+Define your MinIO servers in the inventory/Hosts file. Example:<br>
+[minio_servers]<br>
 minio-1 ansible_host=192.168.1.x<br>
 minio-2 ansible_host=192.168.1.y<br>
 minio-3 ansible_host=192.168.1.z<br>
