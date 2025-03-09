@@ -1,0 +1,15 @@
+# ----------------------------------------------------------------------------
+# Playbook: install_minio.yml
+# Author: [Mohammad Hosein Soufi Ghorbani] mohamadsoufi700@outlook.com
+# Date: 2025-03-09
+# Copyright (C) 2025 [Mohammad Hosein Soufi Ghorbani]. All Rights Reserved.
+#
+# This playbook is licensed under the MIT License. See the LICENSE file for
+# ----------------------------------------------------------------------------
+
+[minio_servers]
+#Example of Inventory
+#minio-1 ansible_host=192.168.1.x
+#minio-2 ansible_host=192.168.1.y
+#minio-3 ansible_host=192.168.1.z
+#minio-4 ansible_host=192.168.1.t

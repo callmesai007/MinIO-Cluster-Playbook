@@ -1,0 +1,92 @@
+# ----------------------------------------------------------------------------
+# Playbook: install_minio.yml
+# Author: [Mohammad Hosein Soufi Ghorbani] mohamadsoufi700@outlook.com
+# Date: 2025-03-09
+# Copyright (C) 2025 [Mohammad Hosein Soufi Ghorbani]. All Rights Reserved.
+#
+# This playbook is licensed under the MIT License. See the LICENSE file for
+# ----------------------------------------------------------------------------
+
+---
+- name: Prompt user for disk to use for MinIO
+  pause:
+    prompt: "Enter the disk to use for MinIO on all nodes (e.g., /dev/sdb):"
+  register: disk_prompt
+  run_once: yes  # Ensure this runs only once
+
+- name: Set disk variable for all nodes
+  set_fact:
+    minio_disk: "{{ disk_prompt.user_input }}"
+  run_once: yes  # Ensure this runs only once
+
+- name: Share disk variable with all hosts
+  set_fact:
+    minio_disk: "{{ hostvars[groups['all'][0]].minio_disk }}"
+  when: inventory_hostname != groups['all'][0]  # Skip the first host (where the variable is already set)
+
+- name: Check if the specified disk exists
+  stat:
+    path: "{{ minio_disk }}"
+  register: disk_stat
+
+- name: Fail if the specified disk does not exist
+  fail:
+    msg: "The disk {{ minio_disk }} does not exist on {{ inventory_hostname }}."
+  when: not disk_stat.stat.exists
+
+- name: Check if disk has a filesystem
+  command: blkid -s TYPE -o value {{ minio_disk }}
+  register: disk_fs_type
+  ignore_errors: yes
+
+- name: Prompt user for filesystem type if disk is not formatted
+  pause:
+    prompt: "The disk {{ minio_disk }} does not have a filesystem. Enter the filesystem type to format it with (default: xfs):"
+  when: disk_fs_type.stdout == ""
+  register: fs_type_prompt
+  run_once: yes  # Ensure this runs only once
+
+- name: Set filesystem type
+  set_fact:
+    fs_type: "{{ fs_type_prompt.user_input | default('xfs') }}"
+  when: disk_fs_type.stdout == ""
+  run_once: yes  # Ensure this runs only once
+
+- name: Share filesystem type with all hosts
+  set_fact:
+    fs_type: "{{ hostvars[groups['all'][0]].fs_type }}"
+  when:
+    - disk_fs_type.stdout == ""
+    - inventory_hostname != groups['all'][0]  # Skip the first host (where the variable is already set)
+
+- name: Format disk with specified filesystem if not already formatted
+  filesystem:
+    fstype: "{{ fs_type }}"
+    dev: "{{ minio_disk }}"
+  when: disk_fs_type.stdout == ""
+
+- name: Get UUID of the disk
+  command: blkid -s UUID -o value {{ minio_disk }}
+  register: disk_uuid
+
+- name: Add disk to /etc/fstab
+  mount:
+    path: "{{ minio_data_dir }}"
+    src: "UUID={{ disk_uuid.stdout }}"
+    fstype: "{{ disk_fs_type.stdout | default(fs_type) }}"  # Use existing filesystem or user-provided type
+    opts: defaults
+    state: present
+
+- name: Ensure MinIO data directory exists
+  file:
+    path: "{{ minio_data_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Mount disk to MinIO data directory
+  mount:
+    path: "{{ minio_data_dir }}"
+    src: "UUID={{ disk_uuid.stdout }}"
+    fstype: "{{ disk_fs_type.stdout | default(fs_type, 'xfs') }}"  # Use existing filesystem or user-provided type
+    opts: "defaults"
+    state: mounted

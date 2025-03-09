@@ -1,0 +1,21 @@
+# ----------------------------------------------------------------------------
+# Playbook: install_minio.yml
+# Author: [Mohammad Hosein Soufi Ghorbani] mohamadsoufi700@outlook.com
+# Date: 2025-03-09
+# Copyright (C) 2025 [Mohammad Hosein Soufi Ghorbani]. All Rights Reserved.
+#
+# This playbook is licensed under the MIT License. See the LICENSE file for
+# ----------------------------------------------------------------------------
+
+---
+- name: Add entries to /etc/hosts for MinIO nodes
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ hostvars[item]['ansible_facts']['default_ipv4']['address'] }} {{ item }}"
+    state: present
+  loop: "{{ groups['minio_servers'] }}"
+  when: inventory_hostname in groups['minio_servers']
+
+- name: Set hostname to match inventory name
+  hostname:
+    name: "{{ inventory_hostname }}"

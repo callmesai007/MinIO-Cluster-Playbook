@@ -1,0 +1,8 @@
+galaxy_info:
+  author: "Mohammad Hosein Soufi Ghorbani"
+  description: "Ansible Playbook,Setup Minio Cluster with Requirment"
+  license: "MIT"
+  min_ansible_version: "1.0"
+  dependencies: []
+
+dependencies: []

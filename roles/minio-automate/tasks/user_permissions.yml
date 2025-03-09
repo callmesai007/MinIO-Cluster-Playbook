@@ -1,0 +1,50 @@
+# ----------------------------------------------------------------------------
+# Playbook: install_minio.yml
+# Author: [Mohammad Hosein Soufi Ghorbani] mohamadsoufi700@outlook.com
+# Date: 2025-03-09
+# Copyright (C) 2025 [Mohammad Hosein Soufi Ghorbani]. All Rights Reserved.
+#
+# This playbook is licensed under the MIT License. See the LICENSE file for
+# ----------------------------------------------------------------------------
+
+---
+- name: Create minio-user group
+  group:
+    name: minio-user
+    state: present
+    system: yes
+
+- name: Create minio-user user
+  user:
+    name: minio-user
+    group: minio-user
+    system: yes
+    create_home: no
+
+- name: Set ownership for MinIO data directory
+  file:
+    path: "{{ minio_data_dir }}"
+    owner: minio-user
+    group: minio-user
+    recurse: yes
+    state: directory
+
+- name: Set ownership for MinIO data directory
+  file:
+    path: "{{ minio_certs_dir }}"
+    owner: minio-user
+    group: minio-user
+    recurse: yes
+    state: directory
+
+- name: Set permissions for /etc/minio/certs
+  file:
+    path: /etc/minio/certs
+    mode: '0755'
+    recurse: yes
+
+- name: Set permissions for /etc/minio/certs/CAs
+  file:
+    path: /etc/minio/certs/CAs
+    mode: '0755'
+    recurse: yes

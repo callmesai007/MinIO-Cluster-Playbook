@@ -1,0 +1,19 @@
+# ----------------------------------------------------------------------------
+# Playbook: install_minio.yml
+# Author: [Mohammad Hosein Soufi Ghorbani] mohamadsoufi700@outlook.com
+# Date: 2025-03-09
+# Copyright (C) 2025 [Mohammad Hosein Soufi Ghorbani]. All Rights Reserved.
+#
+# This playbook is licensed under the MIT License. See the LICENSE file for
+# ----------------------------------------------------------------------------
+
+minio_version: "latest"
+minio_download_url: "https://dl.min.io/server/minio/release/linux-amd64/minio"
+minio_install_dir: "/usr/local/bin"
+minio_data_dir: "/mnt/minio"
+minio_port: 9000
+minio_console_port: 9001
+minio_root_user: "minioadmin"
+minio_root_password: "minioadmin"
+minio_certs_dir: "/etc/minio/certs"
+minio_opts: "--console-address :{{ minio_console_port }}"

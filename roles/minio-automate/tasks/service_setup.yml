@@ -1,0 +1,70 @@
+# ----------------------------------------------------------------------------
+# Playbook: install_minio.yml
+# Author: [Mohammad Hosein Soufi Ghorbani] mohamadsoufi700@outlook.com
+# Date: 2025-03-09
+# Copyright (C) 2025 [Mohammad Hosein Soufi Ghorbani]. All Rights Reserved.
+#
+# This playbook is licensed under the MIT License. See the LICENSE file for
+# ----------------------------------------------------------------------------
+
+---
+- name: Set minio_volumes dynamically
+  set_fact:
+    minio_volumes: "{{ minio_volumes | default([]) + ['https://' + item + ':' + (minio_port | string) + (minio_data_dir | string)] }}"
+  loop: "{{ groups['minio_servers'] }}"
+  loop_control:
+    loop_var: item
+
+- name: Join minio_volumes into a single string
+  set_fact:
+    minio_volumes: "{{ minio_volumes | join(' ') }}"
+
+- name: Ensure /etc/default directory exists
+  file:
+    path: /etc/default
+    state: directory
+    mode: '0755'
+
+- name: Create /etc/default/minio configuration file
+  template:
+    src: etc_default_minio.j2
+    dest: /etc/default/minio
+    mode: '0644'
+
+- name: Debug minio_volumes
+  debug:
+    msg: "minio_volumes = {{ minio_volumes }}"
+
+- name: Ensure MinIO service is configured
+  lineinfile:
+    path: /lib/systemd/system/minio.service
+    regexp: '^ExecStart='
+    line: 'ExecStart=/usr/local/bin/minio server $MINIO_OPTS $MINIO_VOLUMES --certs-dir {{ minio_certs_dir }}'
+    state: present
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+
+- name: Enable and start MinIO service without waiting for status
+  systemd:
+    name: minio
+    enabled: yes
+    state: started
+  ignore_errors: yes
+
+- name: Wait for 40 seconds to allow MinIO to start
+  pause:
+    seconds: 10
+
+- name: Check the status of MinIO service after 40 seconds
+  systemd:
+    name: minio
+    state: started
+  register: minio_service_status
+
+- name: Debug MinIO service status
+  debug:
+    var: minio_service_status
+
+

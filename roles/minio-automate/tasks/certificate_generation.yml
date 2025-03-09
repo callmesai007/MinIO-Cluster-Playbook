@@ -1,0 +1,99 @@
+---
+- name: Ensure temporary directory for certificates exists on control machine
+  delegate_to: localhost
+  run_once: yes
+  file:
+    path: /tmp/minio_certs
+    state: directory
+    mode: '0755'
+
+- name: Generate private key on control machine
+  delegate_to: localhost
+  run_once: yes
+  openssl_privatekey:
+    path: /tmp/minio_certs/private.key
+    size: 4096
+
+- name: Generate CA CSR on control machine
+  delegate_to: localhost
+  run_once: yes
+  openssl_csr:
+    path: /tmp/minio_certs/ca.csr
+    privatekey_path: /tmp/minio_certs/private.key
+    subject:
+      C: US
+      ST: State
+      L: City
+      O: YourOrg
+      OU: YourUnit
+      CN: YourCA
+      emailAddress: you@example.com
+
+- name: Generate CA certificate on control machine
+  delegate_to: localhost
+  run_once: yes
+  openssl_certificate:
+    path: /tmp/minio_certs/ca.crt
+    privatekey_path: /tmp/minio_certs/private.key
+    csr_path: /tmp/minio_certs/ca.csr
+    provider: selfsigned
+    selfsigned_digest: sha256
+    selfsigned_not_after: "+3650d"
+
+- name: Generate server CSR on control machine
+  delegate_to: localhost
+  run_once: yes
+  openssl_csr:
+    path: /tmp/minio_certs/server.csr
+    privatekey_path: /tmp/minio_certs/private.key
+    subject:
+      C: US
+      ST: State
+      L: City
+      O: YourOrg
+      OU: YourUnit
+      CN: "{{ inventory_hostname }}"
+      emailAddress: you@example.com
+    subject_alt_name: "DNS:{{ inventory_hostname }},IP:{{ ansible_facts['default_ipv4']['address'] }}"
+
+- name: Generate server certificate on control machine
+  delegate_to: localhost
+  run_once: yes
+  openssl_certificate:
+    path: /tmp/minio_certs/server.crt
+    csr_path: /tmp/minio_certs/server.csr
+    ownca_path: /tmp/minio_certs/ca.crt
+    ownca_privatekey_path: /tmp/minio_certs/private.key
+    provider: ownca
+    ownca_digest: sha256
+    ownca_not_after: "+3650d"
+
+- name: Ensure MinIO certs directory exists on target servers
+  file:
+    path: "{{ minio_certs_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Ensure MinIO CA certs directory exists on target servers
+  file:
+    path: "{{ minio_certs_dir }}/CAs"
+    state: directory
+    mode: '0755'
+
+- name: Copy CA certificate to target servers
+  copy:
+    src: /tmp/minio_certs/ca.crt
+    dest: "{{ minio_certs_dir }}/CAs/ca.crt"
+    mode: '0644'
+
+- name: Copy server certificate to target servers
+  copy:
+    src: /tmp/minio_certs/server.crt
+    dest: "{{ minio_certs_dir }}/public.crt"
+    mode: '0644'
+
+- name: Copy private key to target servers
+  copy:
+    src: /tmp/minio_certs/private.key
+    dest: "{{ minio_certs_dir }}/private.key"
+    mode: '0600'

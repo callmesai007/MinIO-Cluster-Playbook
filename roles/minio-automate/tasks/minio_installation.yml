@@ -1,0 +1,106 @@
+# ----------------------------------------------------------------------------
+# Playbook: install_minio.yml
+# Author: [Mohammad Hosein Soufi Ghorbani] mohamadsoufi700@outlook.com
+# Date: 2025-03-09
+# Copyright (C) 2025 [Mohammad Hosein Soufi Ghorbani]. All Rights Reserved.
+#
+# This playbook is licensed under the MIT License. See the LICENSE file for
+# ----------------------------------------------------------------------------
+
+---
+- name: Fetch the MinIO releases page
+  uri:
+    url: https://dl.min.io/server/minio/release/linux-amd64/
+    return_content: yes
+  register: minio_releases_page
+
+- name: Extract the latest MinIO version
+  shell: |
+    echo "{{ minio_releases_page.content }}" | grep -oP 'minio_\K[0-9]{14}\.[0-9]+\.[0-9]+' | head -n 1
+  register: minio_latest_version
+
+- name: Debug MinIO latest version
+  debug:
+    msg: "MinIO latest version: {{ minio_latest_version.stdout }}"
+
+- name: Set MinIO download URL based on OS family
+  set_fact:
+    minio_download_url: >-
+      {% if ansible_facts['os_family'] == 'Debian' %}
+        https://dl.min.io/server/minio/release/linux-amd64/minio_{{ minio_latest_version.stdout }}_amd64.deb
+      {% elif ansible_facts['os_family'] == 'RedHat' %}
+        https://dl.min.io/server/minio/release/linux-amd64/minio-{{ minio_latest_version.stdout }}.x86_64.rpm
+      {% else %}
+        https://dl.min.io/server/minio/release/linux-amd64/minio
+      {% endif %}
+
+- name: Debug MinIO download URL
+  debug:
+    msg: "MinIO download URL: {{ minio_download_url }}"
+
+- name: Set package file path based on OS family
+  set_fact:
+    minio_package_path: >-
+      {% if ansible_facts['os_family'] == 'Debian' %}
+        /tmp/minio.deb
+      {% elif ansible_facts['os_family'] == 'RedHat' %}
+        /tmp/minio.rpm
+      {% else %}
+        /tmp/minio
+      {% endif %}
+
+- name: Debug MinIO package path
+  debug:
+    msg: "MinIO package path: {{ minio_package_path }}"
+
+- name: Strip newlines from minio_download_url and minio_package_path
+  set_fact:
+    minio_download_url: "{{ minio_download_url | trim }}"
+    minio_package_path: "{{ minio_package_path | trim }}"
+
+- name: Debug stripped MinIO download URL
+  debug:
+    msg: "Stripped MinIO download URL: {{ minio_download_url }}"
+
+- name: Debug stripped MinIO package path
+  debug:
+    msg: "Stripped MinIO package path: {{ minio_package_path }}"
+
+- name: Check if MinIO is already installed
+  shell: |
+    {% if ansible_facts['os_family'] == 'Debian' %}
+      dpkg -l | grep minio
+    {% elif ansible_facts['os_family'] == 'RedHat' %}
+      rpm -q minio
+    {% else %}
+      which minio
+    {% endif %}
+  register: minio_installed
+  ignore_errors: yes
+  changed_when: false
+
+- name: Download MinIO package
+  get_url:
+    url: "{{ minio_download_url }}"
+    dest: "{{ minio_package_path }}"
+  when:
+    - minio_installed.rc !=0
+
+- name: Install MinIO (Debian-based systems)
+  apt:
+    deb: "{{ minio_package_path }}"
+  when:
+    - ansible_facts['os_family'] == 'Debian'
+    - minio_installed.rc != 0
+
+- name: Install MinIO (Red Hat-based systems)
+  yum:
+    name: "{{ minio_package_path }}"
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - minio_installed.rc != 0
+
+- name: Clean up downloaded package
+  file:
+    path: "{{ minio_package_path }}"
+    state: absent
