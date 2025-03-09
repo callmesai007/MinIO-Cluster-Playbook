@@ -59,65 +59,65 @@ minio-4 ansible_host=192.168.1.t<br>
 The playbook is organized as follows:
 
 .
-├── inventory
-│   └── Hosts
-├── minio-automate.yml
-├── README.md
-└── roles
-    └── minio-automate
-        ├── defaults
-        │   └── main.yml
-        ├── files
-        ├── handlers
-        │   └── main.yml
-        ├── meta
-        │   └── main.yml
-        ├── tasks
-        │   ├── certificate_generation.yml
-        │   ├── disk_validation.yml
-        │   ├── dns_hostname.yml
-        │   ├── main.yml
-        │   ├── minio_installation.yml
-        │   ├── service_setup.yml
-        │   └── user_permissions.yml
-        ├── templates
-        │   └── etc_default_minio.j2
-        └── vars
-            └── main.yml
+├── inventory<br>
+│   └── Hosts<br>
+├── minio-automate.yml<br>
+├── README.md<br>
+└── roles<br>
+    └── minio-automate<br>
+        ├── defaults<br>
+        │   └── main.yml<br>
+        ├── files<br>
+        ├── handlers<br>
+        │   └── main.yml<br>
+        ├── meta<br>
+        │   └── main.yml<br>
+        ├── tasks<br>
+        │   ├── certificate_generation.yml<br>
+        │   ├── disk_validation.yml<br>
+        │   ├── dns_hostname.yml<br>
+        │   ├── main.yml<br>
+        │   ├── minio_installation.yml<br>
+        │   ├── service_setup.yml<br>
+        │   └── user_permissions.yml<br>
+        ├── templates<br>
+        │   └── etc_default_minio.j2<br>
+        └── vars<br>
+            └── main.yml<br>
 
 
 
 ## Usage
 Clone the repository:
 
-git clone https://github.com/muhamadsoufi/MinIO-Cluster-Playbook.git
-cd MinIO-Cluster-Playbook
-Update the inventory/Hosts file with your MinIO server details.
+git clone https://github.com/muhamadsoufi/MinIO-Cluster-Playbook.git<br>
+cd MinIO-Cluster-Playbook<br>
+Update the inventory/Hosts file with your MinIO server details.<br>
 
-Run the playbook:
+Run the playbook:<br>
 ansible-playbook -i inventory/Hosts minio-automate.yml
 
 
 ## Configuration
-Default Variables
-The following variables are defined in roles/minio-automate/defaults/main.yml:
+Default Variables<br>
+The following variables are defined in roles/minio-automate/defaults/main.yml:<br>
 
-minio_version: "latest"
-minio_download_url: "https://dl.min.io/server/minio/release/linux-amd64/minio"
-minio_install_dir: "/usr/local/bin"
-minio_data_dir: "/mnt/minio"
-minio_port: 9000
-minio_console_port: 9001
-minio_root_user: "minioadmin"
-minio_root_password: "minioadmin"
-minio_certs_dir: "/etc/minio/certs"
-minio_opts: "--console-address :{{ minio_console_port }}"
-Customizing Variables
+minio_version: "latest"<br>
+minio_download_url: "https://dl.min.io/server/minio/release/linux-amd64/minio"<br>
+minio_install_dir: "/usr/local/bin"<br>
+minio_data_dir: "/mnt/minio"<br>
+minio_port: 9000<br>
+minio_console_port: 9001<br>
+minio_root_user: "minioadmin"<br>
+minio_root_password: "minioadmin"<br>
+minio_certs_dir: "/etc/minio/certs"<br>
+minio_opts: "--console-address :{{ minio_console_port }}"<br>
+Customizing Variables<br>
 
 
 
-You can override these variables in your playbook or by passing them via the command line. For example:
-ansible-playbook -i inventory/Hosts minio-automate.yml -e "minio_root_password=mysecurepassword"
+You can override these variables in your playbook or by passing them via the command line. For example: <br>
+ansible-playbook -i inventory/Hosts minio-automate.yml -e "minio_root_password=mysecurepassword" <br>
 
 
 
@@ -158,10 +158,10 @@ The playbook executes the following tasks:
 
 
 ## License
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License. See the LICENSE file for details.<br>
 
-Author
-Mohammad Hosein Soufi Ghorbani
-Email: mohamadsoufi700@outlook.com
+Author<br>
+Mohammad Hosein Soufi Ghorbani<br>
+Email: mohamadsoufi700@outlook.com<br>
 GitHub: https://github.com/muhamadsoufi
 
