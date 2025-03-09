@@ -58,29 +58,30 @@ minio-4 ansible_host=192.168.1.t
 ## Playbook Structure
 The playbook is organized as follows:
 
+.
 ├── inventory
-│   └── Hosts
+│   └── Hosts
 ├── minio-automate.yml
 ├── README.md
 └── roles
     └── minio-automate
         ├── defaults
-        │   └── main.yml
+        │   └── main.yml
         ├── files
         ├── handlers
-        │   └── main.yml
+        │   └── main.yml
         ├── meta
-        │   └── main.yml
+        │   └── main.yml
         ├── tasks
-        │   ├── certificate_generation.yml
-        │   ├── disk_validation.yml
-        │   ├── dns_hostname.yml
-        │   ├── main.yml
-        │   ├── minio_installation.yml
-        │   ├── service_setup.yml
-        │   └── user_permissions.yml
+        │   ├── certificate_generation.yml
+        │   ├── disk_validation.yml
+        │   ├── dns_hostname.yml
+        │   ├── main.yml
+        │   ├── minio_installation.yml
+        │   ├── service_setup.yml
+        │   └── user_permissions.yml
         ├── templates
-        │   └── etc_default_minio.j2
+        │   └── etc_default_minio.j2
         └── vars
             └── main.yml
 
